@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>معالجة المياه</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- كود التتبع الخاص بك (سري ولا يظهر للزوار) -->
+    <script data-goatcounter="https://engqais.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -263,7 +267,7 @@
             color: #15803d;
         }
 
-        /* الهامش وعداد الزوار */
+        /* الهامش */
         .footer {
             text-align: center;
             padding: 18px 15px;
@@ -273,22 +277,6 @@
             margin-top: auto;
             border-top: 1px solid #e2e8f0;
             background-color: #f8fafc;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .visitor-counter {
-            font-size: 0.78rem;
-            color: #0284c7;
-            background-color: #e0f2fe;
-            padding: 4px 12px;
-            border-radius: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 600;
         }
     </style>
 </head>
@@ -427,13 +415,9 @@
         </div>
     </div>
 
-    <!-- الهامش المطور وعداد الزوار -->
+    <!-- الهامش المطور -->
     <div class="footer">
-        <div>المهندس قيس قاسم محمد - مديرية ماء ميسان</div>
-        <div class="visitor-counter">
-            <i class="fa-solid fa-eye"></i>
-            <span>عدد الزوار: <strong id="visitsCount">...</strong></span>
-        </div>
+        المهندس قيس قاسم محمد - مديرية ماء ميسان
     </div>
 </div>
 
@@ -445,16 +429,6 @@
             splash.style.opacity = '0';
             splash.style.visibility = 'hidden';
         }, 7000);
-
-        // جلب وتحديث عدد الزوار تلقائياً
-        fetch('https://api.countapi.xyz/hit/engqaisqasim6-water-treatment/visits')
-            .then(res => res.json())
-            .then(res => {
-                document.getElementById('visitsCount').innerText = res.value;
-            })
-            .catch(() => {
-                document.getElementById('visitsCount').innerText = '1';
-            });
     });
 
     function openAlumCalculator() {
@@ -484,11 +458,12 @@
         document.getElementById('headerSub').innerText = 'اختر الخدمة المطلوبة للمتابعة';
     }
 
+    /* معادلات الشب الدقيقة 100% بدون تقريب */
     function calculateGroup1() {
         const cap = parseFloat(document.getElementById('capacity1').value);
         const res = document.getElementById('result1');
         if (!isNaN(cap) && cap > 0) {
-            res.value = Math.round(cap / 10);
+            res.value = cap / 10;
         } else {
             res.value = '';
         }
@@ -498,12 +473,13 @@
         const cap = parseFloat(document.getElementById('capacity2').value);
         const res = document.getElementById('result2');
         if (!isNaN(cap) && cap > 0) {
-            res.value = Math.round((cap / 10) * 0.4);
+            res.value = (cap / 10) * 0.4;
         } else {
             res.value = '';
         }
     }
 
+    /* معادلات القاصر */
     function calculateBleach1() {
         const cap = parseFloat(document.getElementById('bleachCap1').value);
         const res = document.getElementById('bleachRes1');
