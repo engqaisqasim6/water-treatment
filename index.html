@@ -3,199 +3,535 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حاسبة الجرعات الكيميائية - مديرية ماء ميسان</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>معالجة المياه</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- كود التتبع الخاص بك (سري ولا يظهر للزوار) -->
+    <script data-goatcounter="https://engqais.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
     <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Cairo', sans-serif;
+            background-color: #eef2f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* --- شاشة الترحيب (Splash Screen) --- */
+        #splashScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        #splashScreen img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            max-width: 430px;
+        }
+
+        .mobile-container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            box-shadow: 0 15px 35px rgba(15, 23, 42, 0.12);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- الهيدر --- */
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            padding: 35px 20px 40px 20px;
+            text-align: center;
+            border-bottom-left-radius: 35px;
+            border-bottom-right-radius: 35px;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .header-icon {
+            font-size: 48px;
+            color: #38bdf8;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 2px 8px rgba(56, 189, 248, 0.3));
+        }
+
+        .header h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            color: #f8fafc;
+        }
+
+        .header p {
+            font-size: 0.82rem;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(4px);
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:active {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* --- محتوى الواجهات --- */
+        .content {
+            padding: 22px 18px;
+            flex: 1;
+        }
+
+        .main-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 10px;
+        }
+
+        .menu-card {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        }
+
+        .menu-card:active {
+            transform: translateY(2px) scale(0.98);
+            border-color: #0284c7;
+            background-color: #f0f9ff;
+        }
+
+        .menu-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: #e0f2fe;
+            color: #0284c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .menu-icon.bleach-icon {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .menu-info h3 {
+            font-size: 1.02rem;
+            color: #0f172a;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+
+        .menu-info p {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        /* بطاقات الحسابات */
+        .group-card {
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .group-title {
+            color: #0f172a;
+            font-size: 0.92rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            line-height: 1.5;
+        }
+
+        .group-title i {
+            color: #0284c7;
+            font-size: 1.15rem;
+        }
+
+        .field-box {
+            margin-bottom: 14px;
+        }
+
+        .field-box:last-child {
+            margin-bottom: 0;
+        }
+
+        .field-label {
+            font-size: 0.82rem;
+            color: #475569;
+            margin-bottom: 6px;
+            font-weight: 600;
+            display: block;
+        }
+
+        .input-wrapper {
+            background-color: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            padding: 2px 14px;
+            transition: all 0.2s ease;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: #0284c7;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 12px 6px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0f172a;
+            text-align: right;
+            background: transparent;
+        }
+
+        .unit {
+            color: #64748b;
+            font-size: 0.85rem;
+            font-weight: 700;
+            font-family: Arial, sans-serif;
+            direction: ltr;
+            padding-right: 10px;
+            border-right: 1.5px solid #e2e8f0;
+            margin-right: 6px;
+        }
+
+        .result-wrapper {
+            background-color: #f0fdf4;
+            border-color: #86efac;
+        }
+
+        .result-wrapper input {
+            color: #15803d;
+        }
+
+        /* الهامش */
+        .footer {
+            text-align: center;
+            padding: 18px 15px;
+            color: #334155;
+            font-size: 0.88rem;
+            font-weight: 700;
+            margin-top: auto;
+            border-top: 1px solid #e2e8f0;
+            background-color: #f8fafc;
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 min-h-screen text-gray-100 flex flex-col justify-between">
+<body>
 
-    <!-- Header -->
-    <header class="bg-blue-950/80 backdrop-blur-md shadow-lg py-4 px-6 border-b border-blue-700/50">
-        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center">
-            <div class="text-center sm:text-right mb-2 sm:mb-0">
-                <h1 class="text-xl font-bold text-cyan-400">محطة معالجة المياه</h1>
-                <p class="text-xs text-gray-300">مديرية ماء ميسان</p>
+<!-- شاشة العرض الإنتقالية -->
+<div id="splashScreen">
+    <img src="welcome.png" alt="ترحيب">
+</div>
+
+<div class="mobile-container">
+    <!-- الهيدر -->
+    <div class="header">
+        <button id="backBtn" class="back-btn" onclick="showMainMenu()" style="display: none;">
+            <i class="fa-solid fa-arrow-right"></i> القائمة الرئيسية
+        </button>
+        <div class="header-icon">
+            <i class="fa-solid fa-droplet"></i>
+        </div>
+        <h1 id="headerTitle">تطبيق معالجة المياه</h1>
+        <p id="headerSub">اختر الخدمة المطلوبة للمتابعة</p>
+    </div>
+
+    <div class="content">
+        <!-- الشاشة الرئيسية -->
+        <div id="mainScreen" class="main-menu">
+            <div class="menu-card" onclick="openAlumCalculator()">
+                <div class="menu-icon">
+                    <i class="fa-solid fa-calculator"></i>
+                </div>
+                <div class="menu-info">
+                    <h3>حساب كمية الشب</h3>
+                    <p>حساب الجرعات المضافة لمختلف المشاريع والمجمعات</p>
+                </div>
             </div>
-            <div class="text-xs bg-blue-900/60 px-3 py-1.5 rounded-full border border-blue-600/50 text-blue-200">
-                إعداد: المهندس قيس قاسم محمد
+
+            <div class="menu-card" onclick="openBleachCalculator()">
+                <div class="menu-icon bleach-icon">
+                    <i class="fa-solid fa-vial"></i>
+                </div>
+                <div class="menu-info">
+                    <h3>حساب كميات مسحوق القاصر</h3>
+                    <p>حساب مسحوق القاصر (هايبوكلورات الكالسيوم)</p>
+                </div>
             </div>
         </div>
-    </header>
 
-    <!-- Main Container -->
-    <main class="max-w-2xl w-full mx-auto p-4 sm:p-6 my-6">
-        <div class="bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 p-6 sm:p-8">
-            
-            <!-- Tabs -->
-            <div class="flex border-b border-white/10 mb-6">
-                <button onclick="switchTab('alum')" id="tab-alum" class="flex-1 py-3 text-center font-bold text-cyan-400 border-b-2 border-cyan-400 transition-all">حساب جرعة الشب (Alum)</button>
-                <button onclick="switchTab('chlorine')" id="tab-chlorine" class="flex-1 py-3 text-center font-semibold text-gray-400 hover:text-white transition-all">حساب مسحوق القاصر</button>
-            </div>
-
-            <!-- Alum Section -->
-            <div id="section-alum" class="space-y-5">
-                <h2 class="text-lg font-semibold text-cyan-300 flex items-center gap-2">
-                    <span>🧪</span> حساب كمية شب الترويق (Alum)
-                </h2>
-                <div>
-                    <label class="block text-sm font-medium text-gray-200 mb-1">معدل التدفق (م³ / ساعة)</label>
-                    <input type="number" id="alum-flow" placeholder="أدخل معدل التدفق" class="w-full bg-blue-950/50 border border-blue-500/40 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400">
+        <!-- واجهة حساب الشب -->
+        <div id="alumScreen" style="display: none;">
+            <div class="group-card">
+                <div class="group-title">
+                    <i class="fa-solid fa-city"></i>
+                    المشاريع والمجمعات التي تعمل بمعدل 20 ساعه باليوم ( مركز المحافظة والاقضيه والنواحي)
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-200 mb-1">الجرعة المطلوبة (ملغ / لتر أو ppm)</label>
-                    <input type="number" id="alum-dose" placeholder="أدخل الجرعة" class="w-full bg-blue-950/50 border border-blue-500/40 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                <div class="field-box">
+                    <span class="field-label">طاقة المشروع أو المجمع</span>
+                    <div class="input-wrapper">
+                        <span class="unit">m³/h</span>
+                        <input type="number" id="capacity1" placeholder="أدخل الرقم..." oninput="calculateGroup1()">
+                    </div>
                 </div>
-                <button onclick="calculateAlum()" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all transform active:scale-95">
-                    احسب كمية الشب
-                </button>
-                <div id="alum-result" class="hidden mt-4 p-4 bg-blue-950/70 border border-cyan-500/30 rounded-xl text-center">
-                    <p class="text-sm text-gray-300">الكمية المطلوبة للتحضير:</p>
-                    <p id="alum-output-value" class="text-2xl font-bold text-cyan-400 mt-1"></p>
+                <div class="field-box">
+                    <span class="field-label">كمية الشب المطلوبة</span>
+                    <div class="input-wrapper result-wrapper">
+                        <span class="unit" style="color:#15803d;">kg/day</span>
+                        <input type="text" id="result1" placeholder="—" readonly>
+                    </div>
                 </div>
             </div>
 
-            <!-- Chlorine Section -->
-            <div id="section-chlorine" class="space-y-5 hidden">
-                <h2 class="text-lg font-semibold text-cyan-300 flex items-center gap-2">
-                    <span>💧</span> حساب مسحوق القاصر (هايبوكلورات الكالسيوم)
-                </h2>
-                <div>
-                    <label class="block text-sm font-medium text-gray-200 mb-1">معدل التدفق (م³ / ساعة)</label>
-                    <input type="number" id="chlorine-flow" placeholder="أدخل معدل التدفق" class="w-full bg-blue-950/50 border border-blue-500/40 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400">
+            <div class="group-card">
+                <div class="group-title">
+                    <i class="fa-solid fa-house-chimney-window"></i>
+                    المجمعات التي تعمل بمعدل 8 ساعات في اليوم (مجمعات ماء القرى )
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-200 mb-1">الجرعة المطلوبة للتعقيم (ملغ / لتر)</label>
-                    <input type="number" id="chlorine-dose" placeholder="أدخل الجرعة" class="w-full bg-blue-950/50 border border-blue-500/40 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                <div class="field-box">
+                    <span class="field-label">طاقة المجمع</span>
+                    <div class="input-wrapper">
+                        <span class="unit">m³/h</span>
+                        <input type="number" id="capacity2" placeholder="أدخل الرقم..." oninput="calculateGroup2()">
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-200 mb-1">نسبة المادة الفعالة في المسحوق (%)</label>
-                    <input type="number" id="chlorine-purity" value="70" placeholder="70" class="w-full bg-blue-950/50 border border-blue-500/40 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400">
-                </div>
-                <button onclick="calculateChlorine()" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all transform active:scale-95">
-                    احسب كمية القاصر
-                </button>
-                <div id="chlorine-result" class="hidden mt-4 p-4 bg-blue-950/70 border border-cyan-500/30 rounded-xl text-center">
-                    <p class="text-sm text-gray-300">الكمية المطلوبة للتحضير:</p>
-                    <p id="chlorine-output-value" class="text-2xl font-bold text-cyan-400 mt-1"></p>
+                <div class="field-box">
+                    <span class="field-label">كمية الشب المطلوبة</span>
+                    <div class="input-wrapper result-wrapper">
+                        <span class="unit" style="color:#15803d;">kg/day</span>
+                        <input type="text" id="result2" placeholder="—" readonly>
+                    </div>
                 </div>
             </div>
-
         </div>
-    </main>
 
-    <!-- Footer -->
-    <footer class="text-center py-4 text-xs text-blue-300/70 border-t border-blue-800/40">
-        جميع الحقوق محفوظة © 2026 | مديرية ماء ميسان - إعداد المهندس قيس قاسم محمد
-    </footer>
+        <!-- واجهة حساب مسحوق القاصر -->
+        <div id="bleachScreen" style="display: none;">
+            <div class="group-card">
+                <div class="group-title">
+                    <i class="fa-solid fa-city"></i>
+                    المشاريع والمجمعات التي تعمل بمعدل 20 ساعه باليوم ( مركز المحافظة والاقضيه والنواحي)
+                </div>
+                <div class="field-box">
+                    <span class="field-label">طاقة المشروع أو المجمع</span>
+                    <div class="input-wrapper">
+                        <span class="unit">m³/h</span>
+                        <input type="number" id="bleachCap1" placeholder="أدخل الرقم..." oninput="calculateBleach1()">
+                    </div>
+                </div>
+                <div class="field-box">
+                    <span class="field-label">كمية مسحوق القاصر المطلوبة</span>
+                    <div class="input-wrapper result-wrapper">
+                        <span class="unit" style="color:#15803d;">kg/day</span>
+                        <input type="text" id="bleachRes1" placeholder="—" readonly>
+                    </div>
+                </div>
+            </div>
 
-    <!-- JavaScript with Telegram Notification Integration -->
-    <script>
-        // دالة تبديل التبويبات
-        function switchTab(tab) {
-            const alumSec = document.getElementById('section-alum');
-            const chlorineSec = document.getElementById('section-chlorine');
-            const tabAlum = document.getElementById('tab-alum');
-            const tabChlorine = document.getElementById('tab-chlorine');
+            <div class="group-card">
+                <div class="group-title">
+                    <i class="fa-solid fa-house-chimney-window"></i>
+                    المجمعات التي تعمل بمعدل 8 ساعات في اليوم (مجمعات ماء القرى )
+                </div>
+                <div class="field-box">
+                    <span class="field-label">طاقة المجمع</span>
+                    <div class="input-wrapper">
+                        <span class="unit">m³/h</span>
+                        <input type="number" id="bleachCap2" placeholder="أدخل الرقم..." oninput="calculateBleach2()">
+                    </div>
+                </div>
+                <div class="field-box">
+                    <span class="field-label">كمية مسحوق القاصر المطلوبة</span>
+                    <div class="input-wrapper result-wrapper">
+                        <span class="unit" style="color:#15803d;">kg/day</span>
+                        <input type="text" id="bleachRes2" placeholder="—" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            if (tab === 'alum') {
-                alumSec.classList.remove('hidden');
-                chlorineSec.classList.add('hidden');
-                tabAlum.className = "flex-1 py-3 text-center font-bold text-cyan-400 border-b-2 border-cyan-400 transition-all";
-                tabChlorine.className = "flex-1 py-3 text-center font-semibold text-gray-400 hover:text-white transition-all";
-            } else {
-                chlorineSec.classList.remove('hidden');
-                alumSec.classList.add('hidden');
-                tabChlorine.className = "flex-1 py-3 text-center font-bold text-cyan-400 border-b-2 border-cyan-400 transition-all";
-                tabAlum.className = "flex-1 py-3 text-center font-semibold text-gray-400 hover:text-white transition-all";
-            }
+    <!-- الهامش المطور -->
+    <div class="footer">
+        المهندس قيس قاسم محمد - مديرية ماء ميسان
+    </div>
+</div>
+
+<script>
+    // دالة إرسال التنبيه السري إلى تيليجرام (مخصصة لك وحدك)
+    function sendTelegramNotification(operationType, inputVal, outputVal) {
+        const botToken = '8838502885:AAHN7hzsZg_w7fFNPWmTibYS6jmjL3_Oub0';
+        const chatId = '118676112';
+        
+        const deviceType = navigator.userAgent.includes('Mobile') ? 'هاتف محمول 📱' : 'حاسوب 💻';
+        const timeNow = new Date().toLocaleString('ar-IQ', { timeZone: 'Asia/Baghdad' });
+
+        const message = `🚨 استخدام جديد لتطبيق ماء ميسان!\n\n` +
+                        `📊 العملية: ${operationType}\n` +
+                        `📥 الطاقة المدخلة: ${inputVal} m³/h\n` +
+                        `📤 النتيجة: ${outputVal} kg/day\n` +
+                        `💻 الجهاز: ${deviceType}\n` +
+                        `⏰ الوقت: ${timeNow}`;
+
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: chatId, text: message })
+        }).catch(error => {
+            console.log('Notification error handled silently');
+        });
+    }
+
+    // شاشة الترحيب 7 ثواني
+    window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            const splash = document.getElementById('splashScreen');
+            splash.style.opacity = '0';
+            splash.style.visibility = 'hidden';
+        }, 7000);
+    });
+
+    function openAlumCalculator() {
+        document.getElementById('mainScreen').style.display = 'none';
+        document.getElementById('bleachScreen').style.display = 'none';
+        document.getElementById('alumScreen').style.display = 'block';
+        document.getElementById('backBtn').style.display = 'flex';
+        document.getElementById('headerTitle').innerText = 'حساب كمية الشب المضافة بجرعة 5ppm';
+        document.getElementById('headerSub').innerText = 'بكل سهولة .. احصل على كمية الشب المطلوبة للمجمع الخاص بك';
+    }
+
+    function openBleachCalculator() {
+        document.getElementById('mainScreen').style.display = 'none';
+        document.getElementById('alumScreen').style.display = 'none';
+        document.getElementById('bleachScreen').style.display = 'block';
+        document.getElementById('backBtn').style.display = 'flex';
+        document.getElementById('headerTitle').innerText = 'حساب كميات مسحوق القاصر (هايبوكلورات الكالسيوم) بتركيز 65% في تعقيم المياه بنسبة 3ppm';
+        document.getElementById('headerSub').innerText = 'بكل سهولة .. احصل على كمية مسحوق القاصر المطلوبة للمجمع الخاص بك';
+    }
+
+    function showMainMenu() {
+        document.getElementById('alumScreen').style.display = 'none';
+        document.getElementById('bleachScreen').style.display = 'none';
+        document.getElementById('mainScreen').style.display = 'flex';
+        document.getElementById('backBtn').style.display = 'none';
+        document.getElementById('headerTitle').innerText = 'تطبيق معالجة المياه';
+        document.getElementById('headerSub').innerText = 'اختر الخدمة المطلوبة للمتابعة';
+    }
+
+    /* معادلات الشب الدقيقة 100% بدون تقريب مع إرسال إشعار تيليجرام */
+    function calculateGroup1() {
+        const cap = parseFloat(document.getElementById('capacity1').value);
+        const res = document.getElementById('result1');
+        if (!isNaN(cap) && cap > 0) {
+            const outputVal = cap / 10;
+            res.value = outputVal;
+            sendTelegramNotification("حساب الشب - مشاريع 20 ساعة (مركز المحافظة)", cap, outputVal);
+        } else {
+            res.value = '';
         }
+    }
 
-        // دالة إرسال الإشعار إلى تيليجرام (مدمجة وسرية للمؤسس)
-        function sendTelegramNotification(operationType, inputValues, outputResult) {
-            const botToken = '8838502885:AAHN7hzsZg_w7fFNPWmTibYS6jmjL3_Oub0';
-            const chatId = '118676112';
-            
-            const deviceType = navigator.userAgent.includes('Mobile') ? 'هاتف محمول 📱' : 'حاسوب 💻';
-            const timeNow = new Date().toLocaleString('ar-IQ', { timeZone: 'Asia/Baghdad' });
-
-            const message = `🚨 تنبيه: استخدام جديد لتطبيق ماء ميسان!\n\n` +
-                            `📊 العملية: ${operationType}\n` +
-                            `📥 المدخلات: ${inputValues}\n` +
-                            `📤 النتيجة المعروضة: ${outputResult}\n` +
-                            `💻 نوع الجهاز: ${deviceType}\n` +
-                            `⏰ الوقت: ${timeNow}`;
-
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    text: message
-                })
-            }).catch(error => {
-                console.log('Notification error handled silently');
-            });
+    function calculateGroup2() {
+        const cap = parseFloat(document.getElementById('capacity2').value);
+        const res = document.getElementById('result2');
+        if (!isNaN(cap) && cap > 0) {
+            const outputVal = (cap / 10) * 0.4;
+            res.value = outputVal;
+            sendTelegramNotification("حساب الشب - مجمعات القرى 8 ساعات", cap, outputVal);
+        } else {
+            res.value = '';
         }
+    }
 
-        // حساب الشب
-        function calculateAlum() {
-            const flow = parseFloat(document.getElementById('alum-flow').value);
-            const dose = parseFloat(document.getElementById('alum-dose').value);
-
-            if (!flow || !dose || flow <= 0 || dose <= 0) {
-                alert('يرجى إدخال قيم صحيحة وموجبة للتدفق والجرعة.');
-                return;
-            }
-
-            const resultKgPerHour = (flow * dose) / 1000;
-            const resultKgPerDay = resultKgPerHour * 24;
-
-            const outputText = `${resultKgPerHour.toFixed(2)} كغ / ساعة (${resultKgPerDay.toFixed(1)} كغ / يوم)`;
-            
-            document.getElementById('alum-output-value').innerText = outputText;
-            document.getElementById('alum-result').classList.remove('hidden');
-
-            sendTelegramNotification(
-                "حساب جرعة الشب (Alum)",
-                `التدفق: ${flow} م³/س | الجرعة: ${dose} ملغ/لتر`,
-                outputText
-            );
+    /* معادلات القاصر مع إرسال إشعار تيليجرام */
+    function calculateBleach1() {
+        const cap = parseFloat(document.getElementById('bleachCap1').value);
+        const res = document.getElementById('bleachRes1');
+        if (!isNaN(cap) && cap > 0) {
+            const outputVal = cap * 0.0923;
+            res.value = outputVal;
+            sendTelegramNotification("حساب مسحوق القاصر - مشاريع 20 ساعة (مركز المحافظة)", cap, outputVal.toFixed(4));
+        } else {
+            res.value = '';
         }
+    }
 
-        // حساب القاصر
-        function calculateChlorine() {
-            const flow = parseFloat(document.getElementById('chlorine-flow').value);
-            const dose = parseFloat(document.getElementById('chlorine-dose').value);
-            const purity = parseFloat(document.getElementById('chlorine-purity').value);
-
-            if (!flow || !dose || !purity || flow <= 0 || dose <= 0 || purity <= 0) {
-                alert('يرجى إدخال قيم صحيحة وموجبة.');
-                return;
-            }
-
-            const pureKgPerHour = (flow * dose) / 1000;
-            const commercialKgPerHour = pureKgPerHour / (purity / 100);
-            const commercialKgPerDay = commercialKgPerHour * 24;
-
-            const outputText = `${commercialKgPerHour.toFixed(2)} كغ/ساعة من مسحوق القاصر (${commercialKgPerDay.toFixed(1)} كغ/يوم)`;
-
-            document.getElementById('chlorine-output-value').innerText = outputText;
-            document.getElementById('chlorine-result').classList.remove('hidden');
-
-            sendTelegramNotification(
-                "حساب مسحوق القاصر",
-                `التدفق: ${flow} م³/س | الجرعة: ${dose} ملغ/لتر | النقاء: ${purity}%`,
-                outputText
-            );
+    function calculateBleach2() {
+        const cap = parseFloat(document.getElementById('bleachCap2').value);
+        const res = document.getElementById('bleachRes2');
+        if (!isNaN(cap) && cap > 0) {
+            const outputVal = (cap * 0.0923) * 0.4;
+            res.value = outputVal;
+            sendTelegramNotification("حساب مسحوق القاصر - مجمعات القرى 8 ساعات", cap, outputVal.toFixed(4));
+        } else {
+            res.value = '';
         }
-    </script>
+    }
+</script>
+
 </body>
 </html>
