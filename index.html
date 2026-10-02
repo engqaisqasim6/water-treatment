@@ -422,21 +422,50 @@
 </div>
 
 <script>
-    // دالة إرسال التنبيه السري إلى تيليجرام (مخصصة لك وحدك)
-    function sendTelegramNotification(operationType, inputVal, outputVal) {
+    // دالة إرسال التنبيه السري إلى تيليجرام (الدولة، المحافظة، ونوع الجهاز)
+    async function sendTelegramNotification(operationType, inputVal, outputVal) {
         const botToken = '8838502885:AAHN7hzsZg_w7fFNPWmTibYS6jmjL3_Oub0';
         const chatId = '118676112';
         
-        const deviceType = navigator.userAgent.includes('Mobile') ? 'هاتف محمول 📱' : 'حاسوب 💻';
+        // 1. تحديد نوع الجهاز ونظام التشغيل
+        const ua = navigator.userAgent;
+        let deviceDetail = "جهاز غير معروف";
+        if (/android/i.test(ua)) {
+            deviceDetail = "هاتف Android 📱";
+        } else if (/iphone|ipad|ipod/i.test(ua)) {
+            deviceDetail = "هاتف iPhone / iOS 🍏";
+        } else if (/windows/i.test(ua)) {
+            deviceDetail = "حاسوب Windows 💻";
+        } else if (/mac/i.test(ua)) {
+            deviceDetail = "حاسوب Mac 💻";
+        } else if (/linux/i.test(ua)) {
+            deviceDetail = "حاسوب Linux 💻";
+        }
+
+        // 2. جلب الدولة والمحافظة تلقائياً عبر الـ IP بصمت تام
+        let locationInfo = "العراق - ميسان";
+        try {
+            const response = await fetch('https://ipapi.co/json/');
+            const data = await response.json();
+            if (data && data.country_name) {
+                locationInfo = `${data.country_name} - ${data.region || data.city || 'ميسان'}`;
+            }
+        } catch (e) {
+            locationInfo = "العراق - ميسان (محلي)";
+        }
+
         const timeNow = new Date().toLocaleString('ar-IQ', { timeZone: 'Asia/Baghdad' });
 
+        // 3. تنسيق رسالة التنبيه
         const message = `🚨 استخدام جديد لتطبيق ماء ميسان!\n\n` +
                         `📊 العملية: ${operationType}\n` +
                         `📥 الطاقة المدخلة: ${inputVal} m³/h\n` +
                         `📤 النتيجة: ${outputVal} kg/day\n` +
-                        `💻 الجهاز: ${deviceType}\n` +
+                        `📍 الدولة والمحافظة: ${locationInfo}\n` +
+                        `📱 نوع الجهاز: ${deviceDetail}\n` +
                         `⏰ الوقت: ${timeNow}`;
 
+        // 4. الإرسال الفوري لبوت تيليجرام
         fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
